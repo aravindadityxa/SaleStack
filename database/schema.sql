@@ -1,13 +1,12 @@
--- SaleStack Database Schema
+CREATE DATABASE IF NOT EXISTS salestack_db;
+USE salestack_db;
 
--- Create branches table
 CREATE TABLE branches (
     branch_id INT PRIMARY KEY AUTO_INCREMENT,
     branch_name VARCHAR(100) NOT NULL,
     branch_admin_name VARCHAR(100) NOT NULL
 );
 
--- Create customer_sales table
 CREATE TABLE customer_sales (
     sale_id INT PRIMARY KEY AUTO_INCREMENT,
     branch_id INT NOT NULL,
@@ -22,7 +21,6 @@ CREATE TABLE customer_sales (
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE
 );
 
--- Create users table
 CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL,
@@ -33,7 +31,6 @@ CREATE TABLE users (
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE
 );
 
--- Create payment_splits table
 CREATE TABLE payment_splits (
     payment_id INT PRIMARY KEY AUTO_INCREMENT,
     sale_id INT NOT NULL,
@@ -42,3 +39,19 @@ CREATE TABLE payment_splits (
     payment_method VARCHAR(50) NOT NULL,
     FOREIGN KEY (sale_id) REFERENCES customer_sales(sale_id) ON DELETE CASCADE
 );
+
+DELIMITER //
+DROP TRIGGER IF EXISTS update_received_amount //
+CREATE TRIGGER update_received_amount
+AFTER INSERT ON payment_splits
+FOR EACH ROW
+BEGIN
+    UPDATE customer_sales
+    SET received_amount = (
+        SELECT COALESCE(SUM(amount_paid), 0)
+        FROM payment_splits
+        WHERE sale_id = NEW.sale_id
+    )
+    WHERE sale_id = NEW.sale_id;
+END //
+DELIMITER ;
