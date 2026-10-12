@@ -15,7 +15,20 @@ SaleStack is a sales management system designed to help organizations track bran
 
 ## Current Status
 
-This is the initial project foundation with database connectivity. The database schema is in place and the Streamlit application can establish and verify MySQL connections.
+This project includes database connectivity and user authentication. The database schema is in place, the Streamlit application can verify MySQL connections, and users can log in using credentials stored in the MySQL `users` table.
+
+## Authentication
+
+SaleStack uses a secure login system:
+
+- Username and password stored in the `users` table
+- Passwords are hashed using Werkzeug's security functions
+- Login credentials are verified against the database
+- Session state manages the logged-in user
+- User information (role, branch assignment) is available after login
+- Logout clears the session and returns to the login screen
+
+To test the login feature, you need a user record in the `users` table. You can insert a test user with a hashed password directly in MySQL using a tool like MySQL Workbench or the MySQL command line.
 
 ## Database Structure
 
@@ -37,7 +50,8 @@ SaleStack/
 ├── app.py
 └── database/
     ├── schema.sql
-    └── connection.py
+    ├── connection.py
+    └── auth.py
 ```
 
 ## Setup
@@ -94,6 +108,26 @@ streamlit run app.py
 
 The application will be available at `http://localhost:8501`
 
-The app will display the database connection status. If the connection is successful, you'll see a confirmation message. If connection fails, check your `.env` file and MySQL server settings.
+You will see a login screen. Enter the username and password for a user that exists in the `users` table.
+
+### Testing Login
+
+To test the login feature, you need to create a test user in MySQL. First, generate a password hash using Werkzeug:
+
+```python
+from werkzeug.security import generate_password_hash
+print(generate_password_hash("your_password"))
+```
+
+Then insert a test user into the `users` table:
+
+```sql
+INSERT INTO users (username, password, branch_id, role, email) 
+VALUES ('testuser', 'hashed_password_here', 1, 'Admin', 'test@example.com');
+```
+
+Replace `hashed_password_here` with the hash generated above.
+
+After logging in successfully, you will see a welcome message with your username and role. Click the Logout button to return to the login screen.
 
 
