@@ -15,7 +15,7 @@ SaleStack is a sales management system designed to help organizations track bran
 
 ## Current Status
 
-This is the initial project foundation. The core database schema is in place and the Streamlit application is ready to run.
+This is the initial project foundation with database connectivity. The database schema is in place and the Streamlit application can establish and verify MySQL connections.
 
 ## Database Structure
 
@@ -36,7 +36,8 @@ SaleStack/
 ├── .env.example
 ├── app.py
 └── database/
-    └── schema.sql
+    ├── schema.sql
+    └── connection.py
 ```
 
 ## Setup
@@ -56,32 +57,31 @@ SaleStack/
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Set up the database:
-   - Create a MySQL database
-   - Run `database/schema.sql` to create tables:
+3. Create the MySQL database:
+   - Start your MySQL server
+   - Create a new database (e.g., `salestack`)
+   - Run the schema script:
      ```bash
      mysql -u your_username -p your_database < database/schema.sql
      ```
 
-### Environment Configuration
+4. Configure environment variables:
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Update `.env` with your MySQL credentials:
+     ```
+     DB_HOST=localhost
+     DB_PORT=3306
+     DB_NAME=salestack
+     DB_USER=root
+     DB_PASSWORD=your_password
+     ```
 
-1. Copy `.env.example` to `.env`:
+5. Install dependencies:
    ```bash
-   cp .env.example .env
-   ```
-
-2. Update `.env` with your MySQL credentials:
-   ```
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_NAME=salestack
-   DB_USER=root
-   DB_PASSWORD=your_password
+   pip install -r requirements.txt
    ```
 
 ## Running the Application
@@ -93,5 +93,7 @@ streamlit run app.py
 ```
 
 The application will be available at `http://localhost:8501`
+
+The app will display the database connection status. If the connection is successful, you'll see a confirmation message. If connection fails, check your `.env` file and MySQL server settings.
 
 
