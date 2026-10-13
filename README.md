@@ -32,45 +32,20 @@ Branch-Based Sales Management System with automated payment tracking and role-ba
 - View sales records
 - Financial reports and analytics
 
-## Database Setup
+## Quick Start
 
-1. Install MySQL and start the MySQL server
-
-2. Create the database and tables:
-```bash
-mysql -u root -p < database/schema.sql
-```
-
-3. Load demo data:
-```bash
-mysql -u root -p salestack_db < database/demo_data.sql
-```
-
-4. Verify the trigger:
-```sql
-USE salestack_db;
-SELECT sale_id, name, gross_sales, received_amount, pending_amount FROM customer_sales;
-```
-
-## Application Setup
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd SaleStack
-```
-
-2. Install dependencies:
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure database connection:
+### 2. Configure Database
+Copy `.env.example` to `.env` and edit with your MySQL credentials:
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your MySQL credentials:
+Edit `.env`:
 ```
 DB_HOST=localhost
 DB_PORT=3306
@@ -79,12 +54,30 @@ DB_USER=root
 DB_PASSWORD=your_password
 ```
 
-4. Run the application:
+### 3. Initialize Database & Demo Data
+```bash
+python init_demo_data.py
+```
+
+This script creates all tables and loads demo data with proper password hashes.
+
+### 4. Run the Application
 ```bash
 streamlit run app.py
 ```
 
-5. Access the application at `http://localhost:8501`
+Access at: http://localhost:8501
+
+## Database Setup (Manual Alternative)
+
+If `init_demo_data.py` doesn't work, run these commands in MySQL:
+
+```bash
+mysql -u root -p < database/schema.sql
+mysql -u root -p salestack_db < database/demo_data.sql
+```
+
+Note: Manual SQL setup requires manual password hash generation (see init_demo_data.py for proper hash generation).
 
 ## Login Credentials (Demo Data)
 
@@ -122,7 +115,7 @@ streamlit run app.py
 ### users
 - user_id (PK)
 - username
-- password (hashed with Werkzeug)
+- password (hashed with Werkzeug pbkdf2)
 - branch_id (FK)
 - role (Super Admin/Admin)
 - email (UNIQUE)
@@ -185,6 +178,7 @@ SaleStack/
 ├── .gitignore
 ├── .env.example
 ├── app.py
+├── init_demo_data.py
 └── database/
     ├── schema.sql
     ├── demo_data.sql
@@ -198,7 +192,7 @@ SaleStack/
 
 ## Notes
 
-- Passwords are hashed using Werkzeug's security functions
+- Passwords are hashed using Werkzeug's pbkdf2 security functions
 - The trigger ensures no manual calculation of received_amount is needed
 - The generated column automatically calculates pending_amount
 - Demo data includes 3 branches, 3 users, 10 sales, and multiple payments

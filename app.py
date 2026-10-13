@@ -53,7 +53,13 @@ if not st.session_state.logged_in:
                         st.error("Invalid username or password")
                 
                 except Exception as e:
-                    st.error("An error occurred during login. Please try again.")
+                    error_msg = str(e)
+                    if "Database connection failed" in error_msg:
+                        st.error("Database connection error. Please check your configuration.")
+                    elif "Authentication error" in error_msg:
+                        st.error("Authentication failed. Contact administrator.")
+                    else:
+                        st.error("An error occurred during login. Please try again.")
 
 else:
     with st.sidebar:
